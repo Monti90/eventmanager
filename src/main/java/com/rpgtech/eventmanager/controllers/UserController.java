@@ -1,7 +1,9 @@
 package com.rpgtech.eventmanager.controllers;
 
 import com.rpgtech.eventmanager.entities.EventEntity;
+import com.rpgtech.eventmanager.requests.RegistrationRequest;
 import com.rpgtech.eventmanager.services.EventService;
+import com.rpgtech.eventmanager.services.RegistrationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,32 +12,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/event")
+@RequestMapping("api/v1/users")
 @AllArgsConstructor
 public class UserController {
-    private EventService eventService;
 
-    @GetMapping
-    public ResponseEntity<List<EventEntity>> getEvents() {return new ResponseEntity<>(eventService.getEvents(), HttpStatus.OK);}
+    private RegistrationService registrationService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EventEntity> getEventById(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(eventService.findEventById(id), HttpStatus.OK);
+    @PostMapping("")
+    public String register(@RequestBody RegistrationRequest request) {
+        return registrationService.register(request);
     }
 
-    @PostMapping
-    public ResponseEntity<EventEntity> addEvent(@RequestBody EventEntity event){
-        return new ResponseEntity<>(eventService.addEvent(event), HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<EventEntity> updateEvent(@PathVariable("id") Long id, @RequestBody EventEntity event){
-        return new ResponseEntity<>(eventService.updateEvent(event, id), HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEvent(@PathVariable("id") Long id){
-        eventService.deleteEvent(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+    @GetMapping(path = "confirm")
+    public String confirm(@RequestParam("token") String token){ return registrationService.confirmToken(token);}
 }

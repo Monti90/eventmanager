@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Entity
+@Table(name="games")
 public class GameEntity implements Serializable {
 
     @Id
