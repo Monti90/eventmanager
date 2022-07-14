@@ -37,7 +37,9 @@ public class User implements Serializable, UserDetails {
     private String username;
     private String password;
     private String email;
-    private String phone;
+    @OneToOne
+    @JoinColumn(name="user_info_id", referencedColumnName = "id")
+    private UserInfo userInfo;
     @Enumerated(EnumType.STRING)
     private UserRole role;
     private Boolean locked = false;
