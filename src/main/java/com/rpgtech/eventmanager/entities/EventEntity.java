@@ -20,9 +20,9 @@ public class EventEntity implements Serializable {
     private Long id;
     private LocalDateTime startsAt;
     private LocalDateTime endsAt;
-    @OneToMany(mappedBy = "event")
-    private Set<SessionEntity> agendaItems;
     @ManyToOne
     private OrganizationEntity organization;
+    private String description;
+    private boolean isActive;
 
 }

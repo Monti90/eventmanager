@@ -2,6 +2,7 @@ package com.rpgtech.eventmanager.services.impl;
 
 import com.rpgtech.eventmanager.entities.User;
 import com.rpgtech.eventmanager.repositories.UserRepository;
+import com.rpgtech.eventmanager.services.UserInfoService;
 import com.rpgtech.eventmanager.services.UserService;
 import com.rpgtech.eventmanager.token.ConfirmationToken;
 import com.rpgtech.eventmanager.token.ConfirmationTokenService;
@@ -22,6 +23,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
+
+    private final UserInfoService userInfoService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

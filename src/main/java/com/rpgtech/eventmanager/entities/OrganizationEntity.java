@@ -1,12 +1,11 @@
 package com.rpgtech.eventmanager.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -14,13 +13,24 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "organizations")
+@NoArgsConstructor
 public class OrganizationEntity implements Serializable {
 
     @Id
+    @SequenceGenerator(
+            name = "organization_sequence",
+            sequenceName = "organization_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "organization_sequence"
+    )
+    @Column(nullable = false, updatable = false)
     private Long id;
     private String organizationName;
-    @OneToMany(mappedBy = "organization")
-    private Set<UserInfo> organizationMembers;
-    @OneToMany(mappedBy = "organization")
-    private Set<EventEntity> events;
+
+    public OrganizationEntity(String organizationName) {
+        this.organizationName = organizationName;
+    }
 }

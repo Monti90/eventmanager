@@ -7,7 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -18,16 +19,17 @@ public class SessionEntity {
     @Id
     @SequenceGenerator(name = "session_generator")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "session_generator")
-    protected Long id;
-    protected Long peopleLimit;
-    protected String meetingLink;
-    protected LocalDate meetingDate;
+    private Long id;
+    private Long peopleLimit;
+    private String meetingLink;
+    private LocalDateTime startsAt;
+    private LocalDateTime endsAt;
     @ManyToOne
-    protected UserInfo host;
+    private UserInfo host;
     @ManyToOne
-    protected EventEntity event;
+    private EventEntity event;
     @ManyToOne
-    protected ScenarioEntity scenario;
-    protected String description;
-
+    private ScenarioEntity scenario;
+    private String description;
+    private boolean isActive;
 }

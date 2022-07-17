@@ -48,10 +48,12 @@ public class User implements Serializable, UserDetails {
     public User(String userName,
                 String password,
                 String eMail,
+                UserInfo userInfo,
                 UserRole role) {
         this.username = userName;
         this.password = password;
         this.email = eMail;
+        this.userInfo = userInfo;
         this.role = role;
     }
 

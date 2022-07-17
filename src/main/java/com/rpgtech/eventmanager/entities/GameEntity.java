@@ -20,6 +20,4 @@ public class GameEntity implements Serializable {
     private Long Id;
     private String name;
     private Genre genre;
-    @OneToMany(mappedBy = "game")
-    private Set<ScenarioEntity> scenarios;
 }

@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
 @Entity
+@DynamicUpdate
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,16 +19,24 @@ import java.util.Set;
 public class UserInfo implements Serializable {
 
     @Id
+    @SequenceGenerator(
+            name = "user_info_sequence",
+            sequenceName = "user_info_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_info_sequence"
+    )
+    @Column(nullable = false, updatable = false)
     private Long id;
     private String discordName;
     private String phoneNumber;
-    @OneToMany(mappedBy = "userInfo")
-    private Set<ScenarioEntity> scenarios;
-    @OneToMany(mappedBy = "host")
-    private Set<SessionEntity> sessions;
     @ManyToOne
     private OrganizationEntity organization;
-    @OneToOne
-    @JoinColumn(name="user_id", referencedColumnName = "id")
-    private User user;
+
+    public UserInfo(String discordName, String phoneNumber){
+        this.discordName = discordName;
+        this.phoneNumber = phoneNumber;
+    }
 }
