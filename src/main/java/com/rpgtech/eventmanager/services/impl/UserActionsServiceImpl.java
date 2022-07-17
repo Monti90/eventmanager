@@ -24,24 +24,29 @@ public class UserActionsServiceImpl implements UserActionsService {
     @Transactional
     @Override
     public OrganizationEntity createOrganization(OrganizationEntity organization) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long orgId = organizationService.addOrganization(organization.getOrganizationName())
-                                        .getId();
-        Long userInfoId = user
-                            .getUserInfo()
-                            .getId();
-        UserInfo userInfo = userInfoService
-                            .findUserInfoById(userInfoId);
-        OrganizationEntity organizationEntity = organizationService.findOrganizationById(orgId);
-        if(userInfo.getOrganization() == null)
+        if(userInfoService.isUserInOrganization())
         {
+            Long orgId = organizationService.addOrganization(organization.getOrganizationName())
+                                            .getId();
+            OrganizationEntity organizationEntity = organizationService.findOrganizationById(orgId);
+            UserInfo userInfo = userInfoService.currentlyLoggedUser();
             userInfo.setOrganization(organizationEntity);
             userInfoService.updateUserInfo(userInfo);
+            return organizationEntity;
         }
-        else
+        throw new UserAlreadyInOrganizationException("User already belongs to an organization!");
+    }
+
+    @Override
+    public OrganizationEntity joinOrganization(Long id) {
+        if(userInfoService.isUserInOrganization())
         {
-            throw new UserAlreadyInOrganizationException("User already belongs to an organization!");
+            OrganizationEntity organizationEntity = organizationService.findOrganizationById(id);
+            UserInfo userInfo = userInfoService.currentlyLoggedUser();
+            userInfo.setOrganization(organizationEntity);
+            userInfoService.updateUserInfo(userInfo);
+            return organizationEntity;
         }
-        return organizationEntity;
+        throw new UserAlreadyInOrganizationException("User already belongs to an organization!");
     }
 }
