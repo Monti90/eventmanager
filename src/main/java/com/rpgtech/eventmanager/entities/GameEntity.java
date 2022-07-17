@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,5 +20,4 @@ public class GameEntity implements Serializable {
     private Long Id;
     private String name;
     private Genre genre;
-
 }

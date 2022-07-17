@@ -2,9 +2,11 @@ package com.rpgtech.eventmanager.services.impl;
 
 import com.rpgtech.eventmanager.email.EmailSender;
 import com.rpgtech.eventmanager.entities.User;
+import com.rpgtech.eventmanager.entities.UserInfo;
 import com.rpgtech.eventmanager.entities.enums.UserRole;
 import com.rpgtech.eventmanager.requests.RegistrationRequest;
 import com.rpgtech.eventmanager.services.RegistrationService;
+import com.rpgtech.eventmanager.services.UserInfoService;
 import com.rpgtech.eventmanager.services.UserService;
 import com.rpgtech.eventmanager.token.ConfirmationToken;
 import com.rpgtech.eventmanager.token.ConfirmationTokenService;
@@ -23,6 +25,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final UserService userService;
     private final ConfirmationTokenService confirmationTokenService;
     private final EmailSender emailSender;
+    private final UserInfoService userInfoService;
 
     @Override
     public String register(RegistrationRequest request) {
@@ -30,11 +33,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         if(!isEmailValid){
             throw new IllegalStateException("email not valid");
         }
+        Long userInfoId = userInfoService.createUserInfo(request.getDiscordName(), request.getDiscordName()).getId();
         String token = userService.signUpUser(
                 new User(
                         request.getUsername(),
                         request.getPassword(),
                         request.getEmail(),
+                        userInfoService.findUserInfoById(userInfoId),
                         UserRole.USER)
         );
         String link = "http://localhost:8080/api/v1/users/confirm?token=" + token;

@@ -2,6 +2,7 @@ package com.rpgtech.eventmanager.services.impl;
 
 import com.rpgtech.eventmanager.entities.User;
 import com.rpgtech.eventmanager.repositories.UserRepository;
+import com.rpgtech.eventmanager.services.UserInfoService;
 import com.rpgtech.eventmanager.services.UserService;
 import com.rpgtech.eventmanager.token.ConfirmationToken;
 import com.rpgtech.eventmanager.token.ConfirmationTokenService;
@@ -23,10 +24,12 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
 
+    private final UserInfoService userInfoService;
+
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG , email)));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG , username)));
     }
 
     @Override
