@@ -6,4 +6,5 @@ public interface OrganizationService {
 
     public OrganizationEntity addOrganization(String organizationName);
     public OrganizationEntity findOrganizationById(Long id);
+    public void deleteOrganization(OrganizationEntity organization);
 }

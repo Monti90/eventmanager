@@ -49,4 +49,16 @@ public class UserActionsServiceImpl implements UserActionsService {
         }
         throw new UserAlreadyInOrganizationException("User already belongs to an organization!");
     }
+
+    @Override
+    public void leaveOrganization(Long id) {
+            UserInfo userInfo = userInfoService.currentlyLoggedUser();
+            OrganizationEntity organization = userInfo.getOrganization();
+            if(userInfoService.findUsersInOrganization(organization).size() == 1)
+            {
+                organizationService.deleteOrganization(organization);
+            }
+            userInfo.setOrganization(null);
+            userInfoService.updateUserInfo(userInfo);
+    }
 }

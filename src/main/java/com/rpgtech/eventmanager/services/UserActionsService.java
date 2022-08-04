@@ -7,4 +7,5 @@ public interface UserActionsService {
 
     public OrganizationEntity createOrganization(OrganizationEntity organization);
     public OrganizationEntity joinOrganization(Long id);
+    public void leaveOrganization(Long id);
 }

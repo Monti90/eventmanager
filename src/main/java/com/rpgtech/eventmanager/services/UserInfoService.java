@@ -1,8 +1,11 @@
 package com.rpgtech.eventmanager.services;
 
 
+import com.rpgtech.eventmanager.entities.OrganizationEntity;
 import com.rpgtech.eventmanager.entities.User;
 import com.rpgtech.eventmanager.entities.UserInfo;
+
+import java.util.Set;
 
 public interface UserInfoService {
 
@@ -11,4 +14,5 @@ public interface UserInfoService {
     public UserInfo findUserInfoById(Long id);
     public boolean isUserInOrganization();
     public UserInfo currentlyLoggedUser();
+    public Set<UserInfo> findUsersInOrganization(OrganizationEntity organization);
 }

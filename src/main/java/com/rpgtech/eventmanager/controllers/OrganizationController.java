@@ -24,4 +24,9 @@ public class OrganizationController {
     public OrganizationEntity joinOrganization(@PathVariable("id") Long id){
         return userActionsService.joinOrganization(id);
     }
+
+    @DeleteMapping("/{id}")
+    public void leaveOrganization(@PathVariable("id") Long id){
+        userActionsService.leaveOrganization(id);
+    }
 }

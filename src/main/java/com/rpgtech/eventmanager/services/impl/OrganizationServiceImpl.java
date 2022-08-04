@@ -24,4 +24,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         return organizationRepository.findById(id)
                 .orElseThrow(() -> new OrganizationNotFoundException("Organization with id:"+id+" not found"));
     }
+
+    @Override
+    public void deleteOrganization(OrganizationEntity organization) {
+        organizationRepository.delete(organization);
+    }
 }

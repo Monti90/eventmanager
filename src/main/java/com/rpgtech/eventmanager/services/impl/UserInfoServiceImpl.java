@@ -13,14 +13,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
 public class UserInfoServiceImpl implements UserInfoService {
 
     private final UserInfoRepository userInfoRepository;
-
-    private final OrganizationRepository organizationRepository;
 
 
     @Override
@@ -57,5 +56,10 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .getId();
         return userInfoRepository
                 .getById(userInfoId);
+    }
+
+    @Override
+    public Set<UserInfo> findUsersInOrganization(OrganizationEntity organization) {
+        return userInfoRepository.findUserInfosByOrganization(organization);
     }
 }
