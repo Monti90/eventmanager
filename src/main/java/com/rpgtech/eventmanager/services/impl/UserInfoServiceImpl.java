@@ -55,7 +55,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .getUserInfo()
                 .getId();
         return userInfoRepository
-                .getById(userInfoId);
+                .findById(userInfoId)
+                .get();
     }
 
     @Override

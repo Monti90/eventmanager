@@ -1,17 +1,17 @@
 package com.rpgtech.eventmanager.entities;
 
-import com.rpgtech.eventmanager.entities.enums.Genre;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name="games")
+@NoArgsConstructor
 public class GameEntity implements Serializable {
 
     @Id
@@ -19,5 +19,6 @@ public class GameEntity implements Serializable {
     @Column(nullable = false, updatable = false)
     private Long Id;
     private String name;
-    private Genre genre;
+
+    public GameEntity(String gameName){ this.name = gameName;}
 }

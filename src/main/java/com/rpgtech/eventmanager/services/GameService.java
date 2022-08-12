@@ -1,13 +1,15 @@
 package com.rpgtech.eventmanager.services;
 
 import com.rpgtech.eventmanager.entities.EventEntity;
+import com.rpgtech.eventmanager.entities.GameEntity;
 
 import java.util.List;
 
 public interface GameService {
-    EventEntity addEvent(EventEntity event);
-    EventEntity updateEvent(EventEntity event, Long id);
-    List<EventEntity> getEvents();
-    EventEntity findEventById(Long id);
-    void deleteEvent(Long id);
+
+    GameEntity getGameById(Long id);
+    List<GameEntity> getAllGames();
+    GameEntity addGame(String gameName);
+    GameEntity updateGame(String gameName, Long id);
+    void removeGame(Long id);
 }

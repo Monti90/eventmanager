@@ -7,6 +7,8 @@ import com.rpgtech.eventmanager.services.OrganizationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class OrganizationServiceImpl implements OrganizationService {
@@ -26,7 +28,15 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public OrganizationEntity renameOrganization(OrganizationEntity organization) {
+        return organizationRepository.save(organization);
+    }
+
+    @Override
     public void deleteOrganization(OrganizationEntity organization) {
         organizationRepository.delete(organization);
     }
+
+    @Override
+    public List<OrganizationEntity> showOrganizations() {return organizationRepository.findAll();}
 }

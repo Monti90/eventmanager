@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -60,5 +61,17 @@ public class UserActionsServiceImpl implements UserActionsService {
             }
             userInfo.setOrganization(null);
             userInfoService.updateUserInfo(userInfo);
+    }
+
+    @Override
+    public OrganizationEntity renameOrganization(Long id, String name) {
+        OrganizationEntity organization = organizationService.findOrganizationById(id);
+        organization.setOrganizationName(name);
+        return organizationService.renameOrganization(organization);
+    }
+
+    @Override
+    public List<OrganizationEntity> showOrganizations() {
+        return organizationService.showOrganizations();
     }
 }

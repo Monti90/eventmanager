@@ -1,5 +1,7 @@
 package com.rpgtech.eventmanager.entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +20,12 @@ public class EventEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
     private Long id;
+    private String name;
+    @Column(nullable = false)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime startsAt;
+    @Column(nullable = false)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime endsAt;
     @ManyToOne
     private OrganizationEntity organization;
