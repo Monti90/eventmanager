@@ -13,6 +13,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -44,7 +45,10 @@ public class SessionEntity implements EventObserver {
     @ManyToOne
     private ScenarioEntity scenario;
     private boolean isActive;
-    private Set<Observer> participants;
+    @OneToMany
+    private Set<ParticipantEntity> participants = new HashSet<ParticipantEntity>();
+    @OneToMany
+    private Set<UserInfo> users = new HashSet<UserInfo>();
 
     public SessionEntity(SessionBuilder builder){
         this.meetingLink = builder.getMeetingLink();
@@ -55,9 +59,9 @@ public class SessionEntity implements EventObserver {
     }
 
     @Override
-    public void registerObserver(Observer observer) {
-        if(participants.stream().count() > scenario.getPlayers()) {
-            participants.add(observer);
+    public void registerParticipant(ParticipantEntity participant) {
+        if(participants.size()+users.size() > scenario.getPlayers()) {
+            participants.add(participant);
         }
         else {
             throw new SessionIsFullException("This session is already full");
@@ -65,14 +69,43 @@ public class SessionEntity implements EventObserver {
     }
 
     @Override
+    public void registerUser(UserInfo user) {
+        if(participants.size()+users.size() > scenario.getPlayers()) {
+            users.add(user);
+        }
+        else {
+            throw new SessionIsFullException("This session is already full");
+        }
+    }
+
+    @Override
+    public Set<Observer> getObservers() {
+        Set<Observer> players = new HashSet<Observer>();
+        for (ParticipantEntity participant : participants) {
+            players.add(participant);
+        }
+        for (UserInfo user : users) {
+            players.add(user);
+        }
+        return players;
+    }
+
+    @Override
     public void deleteObserver(Observer observer) {
+
+        if (participants.contains(observer)) {
             participants.remove(observer);
+        }
+        else{
+            users.remove(observer);
+        }
     }
 
     @Override
     public void notifyObservers() {
-        for(Observer observer : participants){
-            observer.update(startsAt, endsAt, isActive, participants);
+        Set<Observer> players = getObservers();
+        for (Observer observer : players) {
+            observer.update(startsAt, endsAt, isActive, players);
         }
     }
 }

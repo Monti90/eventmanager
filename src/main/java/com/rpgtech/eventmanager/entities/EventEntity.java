@@ -12,6 +12,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -39,22 +40,50 @@ public class EventEntity implements Serializable, EventObserver {
     private OrganizationEntity organization;
     private String description;
     private boolean isActive;
-    private Set<Observer> participants;
-    private Set<SessionEntity> sessions;
+    @OneToMany
+    private Set<ParticipantEntity> participants = new HashSet<ParticipantEntity>();
+    @OneToMany
+    private Set<UserInfo> users = new HashSet<UserInfo>();
+    @OneToMany
+    private Set<SessionEntity> sessions = new HashSet<SessionEntity>();
+
 
     @Override
-    public void registerObserver(Observer observer) {
-            participants.add(observer);
+    public void registerParticipant(ParticipantEntity participant) {
+        participants.add(participant);
+    }
+
+    @Override
+    public void registerUser(UserInfo user) {
+        users.add(user);
+    }
+
+    @Override
+    public Set<Observer> getObservers() {
+        Set<Observer> players = new HashSet<Observer>();
+        for (ParticipantEntity participant : participants) {
+            players.add(participant);
+        }
+        for (UserInfo user : users) {
+            players.add(user);
+        }
+        return players;
     }
 
     @Override
     public void deleteObserver(Observer observer) {
+        if (participants.contains(observer)) {
             participants.remove(observer);
+        }
+        else{
+            users.remove(observer);
+        }
     }
 
     @Override
     public void notifyObservers() {
-        for(Observer observer : participants){
+        Set<Observer> players = getObservers();
+        for(Observer observer : players){
             observer.update(startsAt, endsAt, isActive, sessions);
         }
     }
