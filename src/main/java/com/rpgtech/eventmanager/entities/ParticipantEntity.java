@@ -20,8 +20,4 @@ public class ParticipantEntity {
     private String email;
     private String discordName;
     private boolean isRegistered;
-    @ManyToOne
-    private EventEntity event;
-    @ManyToOne
-    private SessionEntity session;
 }

@@ -11,13 +11,14 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "events")
-public class EventEntity implements Serializable {
+public class EventEntity implements Serializable, EventObserver {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,5 +39,23 @@ public class EventEntity implements Serializable {
     private OrganizationEntity organization;
     private String description;
     private boolean isActive;
+    private Set<Observer> participants;
+    private Set<SessionEntity> sessions;
 
+    @Override
+    public void registerObserver(Observer observer) {
+            participants.add(observer);
+    }
+
+    @Override
+    public void deleteObserver(Observer observer) {
+            participants.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for(Observer observer : participants){
+            observer.update(startsAt, endsAt, isActive, sessions);
+        }
+    }
 }

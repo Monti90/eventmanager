@@ -85,10 +85,7 @@ public class SessionServiceImpl implements SessionService {
         SessionEntity sessionEntity = sessionRepository.findById(id)
                 .orElseThrow(() -> new SessionNotFoundException("Session with id:"+id+" not found!"));
         ScenarioEntity scenario = scenarioService.getScenarioById(session.getScenarioID());
-        EventEntity event = null;
-        if(session.getEventID() != null){
-            event = eventService.findEventById(session.getEventID());
-        }
+        EventEntity event = handleSessionEvent(session, scenario);
         sessionEntity = new SessionBuilder(session.getMeetingLink(),
                 userInfoService.currentlyLoggedUser(),
                 session.getStartsAt(),
