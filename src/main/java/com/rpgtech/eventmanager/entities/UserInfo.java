@@ -8,6 +8,8 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Set;
 
 @Entity
@@ -16,7 +18,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserInfo implements Serializable {
+public class UserInfo implements Serializable, Observer {
 
     @Id
     @SequenceGenerator(
@@ -38,5 +40,10 @@ public class UserInfo implements Serializable {
     public UserInfo(String discordName, String phoneNumber){
         this.discordName = discordName;
         this.phoneNumber = phoneNumber;
+    }
+
+    @Override
+    public void update(LocalDateTime startTime, LocalDateTime endTime, boolean isActive, Collection<?> collection) {
+        
     }
 }

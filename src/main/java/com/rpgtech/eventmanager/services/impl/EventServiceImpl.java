@@ -54,13 +54,17 @@ public class EventServiceImpl implements EventService {
             throw new UserNotInOrganizationException("This user does not have permission to edit this specific event");
         }
         event.setId(id);
+        event.setOrganization(eventEntity.getOrganization());
         event.setActive(true);
         return eventRepository.save(event);
     }
 
     @Override
     public List<EventEntity> getEvents() {
-        return eventRepository.findAll();
+        return eventRepository.findAll()
+                .stream()
+                .filter(event -> event.isActive() == true)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -70,7 +74,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void deleteEvent(Long id) {
-    eventRepository.delete(findEventById(id));
+    public EventEntity cancelEvent(Long id) {
+        EventEntity event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException("Event with ID: "+id+" not found"));
+        event.setActive(false);
+        return eventRepository.save(event);
     }
+
 }
