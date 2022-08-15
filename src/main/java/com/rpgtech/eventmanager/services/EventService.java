@@ -10,6 +10,5 @@ public interface EventService {
     EventEntity updateEvent(EventEntity event, Long id);
     List<EventEntity> getEvents();
     EventEntity findEventById(Long id);
-    void deleteEvent(Long id);
-
+    EventEntity cancelEvent(Long id);
 }

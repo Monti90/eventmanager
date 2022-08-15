@@ -9,6 +9,6 @@ public interface ScenarioService {
     ScenarioEntity addScenario(ScenarioEntity scenario, Long gameID);
     ScenarioEntity updateScenario(ScenarioEntity scenario, Long id, Long gameID);
     void deleteScenario(Long id);
-
     List<ScenarioEntity> getUserScenarios();
+    ScenarioEntity getScenarioById(Long id);
 }

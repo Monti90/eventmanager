@@ -25,6 +25,9 @@ public class ScenarioServiceImpl implements ScenarioService {
     public ScenarioEntity addScenario(ScenarioEntity scenario, Long gameID) {
         scenario.setGame(gameService.getGameById(gameID));
         scenario.setUserInfo(userInfoService.currentlyLoggedUser());
+        if(scenario.getDurationMinutes() == null){
+            scenario.setDurationMinutes(0l);
+        }
         return scenarioRepository.save(scenario);
     }
 
@@ -36,6 +39,9 @@ public class ScenarioServiceImpl implements ScenarioService {
         scenarioEntity.setGame(gameService.getGameById(gameID));
         scenarioEntity.setScenarioID(id);
         scenarioEntity.setUserInfo(userInfoService.currentlyLoggedUser());
+        if(scenario.getDurationMinutes() == null){
+            scenario.setDurationMinutes(0l);
+        }
         return scenarioRepository.save(scenarioEntity);
     }
 
@@ -47,5 +53,11 @@ public class ScenarioServiceImpl implements ScenarioService {
     @Override
     public List<ScenarioEntity> getUserScenarios() {
         return scenarioRepository.findAllByUserInfo(userInfoService.currentlyLoggedUser());
+    }
+
+    @Override
+    public ScenarioEntity getScenarioById(Long id) {
+        return scenarioRepository.findById(id)
+                .orElseThrow(()-> new ScenarioNotFoundException("Scenario with ID:"+ id +" not found."));
     }
 }
