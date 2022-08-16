@@ -12,4 +12,12 @@ public interface ParticipantService {
     String assignUnregisteredToSession(ParticipantEntity participant, Long id);
 
     String assignUnregisteredToEvent(ParticipantEntity participant, Long id);
+
+    String resignLoggedUserSession(Long sessionId);
+
+    String resignUnregisteredSession(Long id, Long sessionId);
+
+    String resignLoggedUserEvent(Long eventId);
+
+    String resignUnregisteredEvent(Long id, Long eventId);
 }

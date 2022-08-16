@@ -2,9 +2,7 @@ package com.rpgtech.eventmanager.services.impl;
 
 import com.rpgtech.eventmanager.builders.SessionBuilder;
 import com.rpgtech.eventmanager.dto.SessionCreateDTO;
-import com.rpgtech.eventmanager.entities.EventEntity;
-import com.rpgtech.eventmanager.entities.ScenarioEntity;
-import com.rpgtech.eventmanager.entities.SessionEntity;
+import com.rpgtech.eventmanager.entities.*;
 import com.rpgtech.eventmanager.exceptions.SessionNotFoundException;
 import com.rpgtech.eventmanager.exceptions.SessionNotInEventTimeException;
 import com.rpgtech.eventmanager.repositories.SessionRepository;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -101,11 +100,39 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    public void assignParticipantsToSession(Set<ParticipantEntity> participants, Long id) {
+        SessionEntity sessionEntity = sessionRepository.findById(id)
+                .orElseThrow(() -> new SessionNotFoundException("Session with id:"+id+" not found!"));
+        sessionEntity.setParticipants(participants);
+        sessionRepository.save(sessionEntity);
+    }
+
+    @Override
+    public void assignUsersToSession(Set<UserInfo> users, Long id) {
+        SessionEntity sessionEntity = sessionRepository.findById(id)
+                .orElseThrow(() -> new SessionNotFoundException("Session with id:"+id+" not found!"));
+        sessionEntity.setUsers(users);
+        sessionRepository.save(sessionEntity);
+    }
+
+    @Override
     public SessionEntity cancelSession(Long id) {
         SessionEntity session = sessionRepository.findById(id)
                 .orElseThrow(() -> new SessionNotFoundException("Session with id:"+id+" not found!"));
         session.setActive(false);
         return sessionRepository.save(session);
+    }
+
+    @Override
+    public SessionEntity appendSessionToEvent(Long id, Long eventId) {
+        SessionEntity session = sessionRepository.findById(id)
+                .orElseThrow(() -> new SessionNotFoundException("Session with id:"+id+" not found!"));
+        EventEntity event = eventService.findEventById(eventId);
+        if(session.getEndsAt().isBefore(event.getEndsAt()) && session.getStartsAt().isAfter(event.getStartsAt())) {
+            session.setEvent(event);
+            return sessionRepository.save(session);
+        }
+        throw new SessionNotInEventTimeException("This session time does not fit in the event time!");
     }
 
     public LocalDateTime calculateSessionEndTime(LocalDateTime sessionStart, Long hours, Long minutes)

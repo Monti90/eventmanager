@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.rpgtech.eventmanager.builders.SessionBuilder;
+import com.rpgtech.eventmanager.exceptions.ParticipantNotFoundException;
 import com.rpgtech.eventmanager.exceptions.SessionIsFullException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -47,7 +49,7 @@ public class SessionEntity implements EventObserver {
     private boolean isActive;
     @OneToMany
     private Set<ParticipantEntity> participants = new HashSet<ParticipantEntity>();
-    @OneToMany
+    @ManyToMany
     private Set<UserInfo> users = new HashSet<UserInfo>();
 
     public SessionEntity(SessionBuilder builder){
@@ -59,9 +61,10 @@ public class SessionEntity implements EventObserver {
     }
 
     @Override
-    public void registerParticipant(ParticipantEntity participant) {
-        if(participants.size()+users.size() > scenario.getPlayers()) {
+    public Set<ParticipantEntity> registerParticipant(ParticipantEntity participant) {
+        if(participants.size()+users.size() < scenario.getPlayers()) {
             participants.add(participant);
+            return  participants;
         }
         else {
             throw new SessionIsFullException("This session is already full");
@@ -69,13 +72,29 @@ public class SessionEntity implements EventObserver {
     }
 
     @Override
-    public void registerUser(UserInfo user) {
-        if(participants.size()+users.size() > scenario.getPlayers()) {
+    public Set<UserInfo> registerUser(UserInfo user) {
+        if(participants.size()+users.size() < scenario.getPlayers()) {
             users.add(user);
+            return users;
         }
         else {
             throw new SessionIsFullException("This session is already full");
         }
+    }
+
+    @Override
+    public Set<ParticipantEntity> resignParticipant(Optional<ParticipantEntity> participant) {
+        if(participant.isPresent()){
+            participants.remove(participant.get());
+            return participants;
+        }
+        throw new ParticipantNotFoundException("Participant with this id does not exist in this event");
+    }
+
+    @Override
+    public Set<UserInfo> resignUser(UserInfo user) {
+        users.remove(user);
+        return users;
     }
 
     @Override
@@ -98,14 +117,6 @@ public class SessionEntity implements EventObserver {
         }
         else{
             users.remove(observer);
-        }
-    }
-
-    @Override
-    public void notifyObservers() {
-        Set<Observer> players = getObservers();
-        for (Observer observer : players) {
-            observer.update(startsAt, endsAt, isActive, players);
         }
     }
 }

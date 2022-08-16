@@ -27,7 +27,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     public String assignUserToSession(Long id) {
         SessionEntity session = sessionService.getSessionById(id);
         UserInfo user = userInfoService.currentlyLoggedUser();
-        session.registerUser(user);
+        sessionService.assignUsersToSession(session.registerUser(user), id);
         return "You have been registered to this session, there is "+session.getObservers().size()+" places taken out of"+session.getScenario().getPlayers()+".";
     }
 
@@ -35,15 +35,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     public String assignUserToEvent(Long id) {
         EventEntity event = eventService.findEventById(id);
         UserInfo user = userInfoService.currentlyLoggedUser();
-        event.registerUser(user);
-        return "You have been registered to this session, there is "+event.getObservers().size()+" places taken.";
+        eventService.assignUsersToEvent(event.registerUser(user), id);
+        return "You have been registered to this event, there is "+event.getObservers().size()+" places taken.";
     }
 
     @Override
     public String assignUnregisteredToSession(ParticipantEntity participant, Long id) {
         SessionEntity session = sessionService.getSessionById(id);
         participantRepository.save(participant);
-        session.registerParticipant(participant);
+        sessionService.assignParticipantsToSession(session.registerParticipant(participant), id);
         return "You have been registered to this session, there is "+session.getObservers().size()+" places taken out of"+session.getScenario().getPlayers()+".";
     }
 
@@ -51,7 +51,35 @@ public class ParticipantServiceImpl implements ParticipantService {
     public String assignUnregisteredToEvent(ParticipantEntity participant, Long id) {
         EventEntity event = eventService.findEventById(id);
         participantRepository.save(participant);
-        event.registerParticipant(participant);
-        return "You have been registered to this session, there is "+event.getObservers().size()+" places taken.";
+        eventService.assignParticipantsToEvent(event.registerParticipant(participant), id);
+        return "You have been registered to this event, there is "+event.getObservers().size()+" places taken.";
+    }
+
+    @Override
+    public String resignLoggedUserSession(Long sessionId) {
+        SessionEntity session = sessionService.getSessionById(sessionId);
+        sessionService.assignUsersToSession(session.resignUser(userInfoService.currentlyLoggedUser()), sessionId);
+        return "You have been removed from this session, there is "+session.getObservers().size()+" places taken out of"+session.getScenario().getPlayers()+".";
+    }
+
+    @Override
+    public String resignUnregisteredSession(Long id, Long sessionId) {
+        SessionEntity session = sessionService.getSessionById(sessionId);
+        sessionService.assignParticipantsToSession(session.resignParticipant(participantRepository.findById(id)), sessionId);
+        return "You have been removed from this session, there is "+session.getObservers().size()+" places taken out of"+session.getScenario().getPlayers()+".";
+    }
+
+    @Override
+    public String resignLoggedUserEvent(Long eventId) {
+        EventEntity event = eventService.findEventById(eventId);
+        eventService.assignUsersToEvent(event.resignUser(userInfoService.currentlyLoggedUser()), eventId);
+        return "You have been removed from this event, there is "+event.getObservers().size()+" places taken.";
+    }
+
+    @Override
+    public String resignUnregisteredEvent(Long id, Long eventId) {
+        EventEntity event = eventService.findEventById(eventId);
+        eventService.assignParticipantsToEvent(event.resignParticipant(participantRepository.findById(id)), eventId);
+        return "You have been removed from this event, there is "+event.getObservers().size()+" places taken.";
     }
 }

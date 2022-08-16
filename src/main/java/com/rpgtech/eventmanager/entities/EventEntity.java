@@ -5,14 +5,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.rpgtech.eventmanager.exceptions.ParticipantNotFoundException;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
@@ -42,20 +43,37 @@ public class EventEntity implements Serializable, EventObserver {
     private boolean isActive;
     @OneToMany
     private Set<ParticipantEntity> participants = new HashSet<ParticipantEntity>();
-    @OneToMany
+    @ManyToMany
     private Set<UserInfo> users = new HashSet<UserInfo>();
     @OneToMany
     private Set<SessionEntity> sessions = new HashSet<SessionEntity>();
 
 
     @Override
-    public void registerParticipant(ParticipantEntity participant) {
+    public Set<ParticipantEntity> registerParticipant(ParticipantEntity participant) {
         participants.add(participant);
+        return  participants;
     }
 
     @Override
-    public void registerUser(UserInfo user) {
+    public Set<UserInfo> registerUser(UserInfo user) {
         users.add(user);
+        return users;
+    }
+
+    @Override
+    public Set<ParticipantEntity> resignParticipant(Optional<ParticipantEntity> participant) {
+        if(participant.isPresent()){
+            participants.remove(participant.get());
+            return participants;
+        }
+        throw new ParticipantNotFoundException("Participant with this id does not exist in this event");
+    }
+
+    @Override
+    public Set<UserInfo> resignUser(UserInfo user) {
+        users.remove(user);
+        return users;
     }
 
     @Override
@@ -77,14 +95,6 @@ public class EventEntity implements Serializable, EventObserver {
         }
         else{
             users.remove(observer);
-        }
-    }
-
-    @Override
-    public void notifyObservers() {
-        Set<Observer> players = getObservers();
-        for(Observer observer : players){
-            observer.update(startsAt, endsAt, isActive, sessions);
         }
     }
 }

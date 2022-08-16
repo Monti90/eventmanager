@@ -41,4 +41,9 @@ public class SessionController {
     public ResponseEntity<SessionEntity> cancelSession(@PathVariable("id") Long id){
         return new ResponseEntity<>(sessionService.cancelSession(id),HttpStatus.OK);
     }
+
+    @PutMapping("/eventAppend/{id}/{eventId}")
+    public ResponseEntity<SessionEntity> appendSessionToEvent(@PathVariable("id") Long id, @PathVariable("eventId") Long eventId){
+        return new ResponseEntity<>(sessionService.appendSessionToEvent(id, eventId), HttpStatus.OK);
+    }
 }

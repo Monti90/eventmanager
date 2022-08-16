@@ -1,13 +1,14 @@
 package com.rpgtech.eventmanager.entities;
 
-import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 public interface EventObserver {
-    public void registerParticipant(ParticipantEntity participant);
-    public void registerUser(UserInfo user);
+    public Set<ParticipantEntity> registerParticipant(ParticipantEntity participant);
+    public Set<UserInfo> registerUser(UserInfo user);
+    public Set<ParticipantEntity> resignParticipant(Optional<ParticipantEntity> participant);
+    public Set<UserInfo> resignUser(UserInfo user);
     public Set<Observer> getObservers();
 
     public void deleteObserver(Observer observer);
-    public void notifyObservers();
 }

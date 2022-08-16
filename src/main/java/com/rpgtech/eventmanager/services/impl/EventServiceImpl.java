@@ -1,6 +1,7 @@
 package com.rpgtech.eventmanager.services.impl;
 
 import com.rpgtech.eventmanager.entities.EventEntity;
+import com.rpgtech.eventmanager.entities.ParticipantEntity;
 import com.rpgtech.eventmanager.entities.UserInfo;
 import com.rpgtech.eventmanager.exceptions.BadTimeSpanException;
 import com.rpgtech.eventmanager.exceptions.EventNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,6 +73,20 @@ public class EventServiceImpl implements EventService {
     public EventEntity findEventById(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new EventNotFoundException("Event with ID: "+id+" not found"));
+    }
+
+    @Override
+    public void assignParticipantsToEvent(Set<ParticipantEntity> participants, Long id) {
+            EventEntity event = findEventById(id);
+            event.setParticipants(participants);
+            eventRepository.save(event);
+    }
+
+    @Override
+    public void assignUsersToEvent(Set<UserInfo> users, Long id) {
+        EventEntity event = findEventById(id);
+        event.setUsers(users);
+        eventRepository.save(event);
     }
 
     @Override
