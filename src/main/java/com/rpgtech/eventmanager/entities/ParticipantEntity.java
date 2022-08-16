@@ -20,8 +20,8 @@ public class ParticipantEntity implements Observer {
     private String email;
     private String discordName;
 
-    @Override
-    public void update(LocalDateTime startTime, LocalDateTime endTime, boolean isActive, Collection<?> collection) {
-
+    public Long getId(){
+        return id;
     }
+
 }

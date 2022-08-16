@@ -33,17 +33,15 @@ public class UserInfo implements Serializable, Observer {
     @Column(nullable = false, updatable = false)
     private Long id;
     private String discordName;
+    private String email;
     private String phoneNumber;
     @ManyToOne
     private OrganizationEntity organization;
 
-    public UserInfo(String discordName, String phoneNumber){
+    public UserInfo(String discordName, String phoneNumber, String email){
         this.discordName = discordName;
         this.phoneNumber = phoneNumber;
+        this.email = email;
     }
 
-    @Override
-    public void update(LocalDateTime startTime, LocalDateTime endTime, boolean isActive, Collection<?> collection) {
-        
-    }
 }

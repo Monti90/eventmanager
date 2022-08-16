@@ -2,14 +2,13 @@ package com.rpgtech.eventmanager.services;
 
 
 import com.rpgtech.eventmanager.entities.OrganizationEntity;
-import com.rpgtech.eventmanager.entities.User;
 import com.rpgtech.eventmanager.entities.UserInfo;
 
 import java.util.Set;
 
 public interface UserInfoService {
 
-    public UserInfo createUserInfo(String discordName, String phoneNumber);
+    public UserInfo createUserInfo(String discordName, String phoneNumber, String email);
     public UserInfo updateUserInfo(UserInfo userInfo);
     public UserInfo findUserInfoById(Long id);
     public boolean isUserInOrganization();

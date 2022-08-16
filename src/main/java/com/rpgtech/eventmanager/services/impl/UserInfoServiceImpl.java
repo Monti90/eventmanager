@@ -3,16 +3,12 @@ package com.rpgtech.eventmanager.services.impl;
 import com.rpgtech.eventmanager.entities.OrganizationEntity;
 import com.rpgtech.eventmanager.entities.User;
 import com.rpgtech.eventmanager.entities.UserInfo;
-import com.rpgtech.eventmanager.exceptions.OrganizationNotFoundException;
-import com.rpgtech.eventmanager.exceptions.UserInfoNotFoundException;
-import com.rpgtech.eventmanager.repositories.OrganizationRepository;
 import com.rpgtech.eventmanager.repositories.UserInfoRepository;
 import com.rpgtech.eventmanager.services.UserInfoService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -23,10 +19,11 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 
     @Override
-    public UserInfo createUserInfo(String discordName, String phoneNumber) {
+    public UserInfo createUserInfo(String discordName, String phoneNumber, String email) {
         UserInfo userInfo = new UserInfo(
                 discordName,
-                phoneNumber
+                phoneNumber,
+                email
         );
         return userInfoRepository.save(userInfo);
     }

@@ -33,7 +33,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         if(!isEmailValid){
             throw new IllegalStateException("email not valid");
         }
-        Long userInfoId = userInfoService.createUserInfo(request.getDiscordName(), request.getDiscordName()).getId();
+        Long userInfoId = userInfoService.createUserInfo(request.getDiscordName(), request.getDiscordName(), request.getEmail()).getId();
         String token = userService.signUpUser(
                 new User(
                         request.getUsername(),

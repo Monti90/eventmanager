@@ -1,6 +1,8 @@
 package com.rpgtech.eventmanager.services.impl;
 
+import com.rpgtech.eventmanager.email.EmailSender;
 import com.rpgtech.eventmanager.entities.EventEntity;
+import com.rpgtech.eventmanager.entities.Observer;
 import com.rpgtech.eventmanager.entities.ParticipantEntity;
 import com.rpgtech.eventmanager.entities.UserInfo;
 import com.rpgtech.eventmanager.exceptions.BadTimeSpanException;
@@ -8,6 +10,7 @@ import com.rpgtech.eventmanager.exceptions.EventNotFoundException;
 import com.rpgtech.eventmanager.exceptions.UserNotInOrganizationException;
 import com.rpgtech.eventmanager.repositories.EventRepository;
 import com.rpgtech.eventmanager.services.EventService;
+import com.rpgtech.eventmanager.services.RegistrationService;
 import com.rpgtech.eventmanager.services.UserInfoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final UserInfoService userInfoService;
+    private final EmailSender emailSender;
 
     @Override
     public EventEntity addEvent(EventEntity event) {
@@ -58,6 +62,9 @@ public class EventServiceImpl implements EventService {
         event.setId(id);
         event.setOrganization(eventEntity.getOrganization());
         event.setActive(true);
+        event.setParticipants(eventEntity.getParticipants());
+        event.setUsers(eventEntity.getUsers());
+        handleEmailsOnEdit(event);
         return eventRepository.save(event);
     }
 
@@ -97,4 +104,17 @@ public class EventServiceImpl implements EventService {
         return eventRepository.save(event);
     }
 
+    public void handleEmailsOnEdit(EventEntity event){
+        Set<Observer> observers = event.getObservers();
+        for(Observer observer : observers){
+            String link;
+            if(observer.getClass().equals(UserInfo.class)){
+                link = "http://localhost:8080/participant/cancel/event?event" + event.getId();
+            }
+            else{
+                link = "http://localhost:8080/participant/cancel/withoutAccount/event/"+observer.getId()+"?event" + event.getId();
+            }
+            emailSender.send(observer.getEmail(), EventService.buildEmail(observer.getEmail(), event, link));
+        }
+    }
 }
