@@ -56,6 +56,7 @@ public class SessionServiceImpl implements SessionService {
         return sessionRepository.save(sessionEntity);
     }
 
+    //TODO - dodać obsługę mailową dla listy eventów
     private EventEntity handleSessionEvent(SessionCreateDTO session, ScenarioEntity scenario){
         if(session.getEventID() != null){
             EventEntity event = eventService.findEventById(session.getEventID());
