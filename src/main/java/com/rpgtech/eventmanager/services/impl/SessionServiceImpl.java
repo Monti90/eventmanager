@@ -2,19 +2,18 @@ package com.rpgtech.eventmanager.services.impl;
 
 import com.rpgtech.eventmanager.builders.SessionBuilder;
 import com.rpgtech.eventmanager.dto.SessionCreateDTO;
+import com.rpgtech.eventmanager.email.EmailSender;
 import com.rpgtech.eventmanager.entities.*;
 import com.rpgtech.eventmanager.exceptions.SessionNotFoundException;
 import com.rpgtech.eventmanager.exceptions.SessionNotInEventTimeException;
 import com.rpgtech.eventmanager.repositories.SessionRepository;
-import com.rpgtech.eventmanager.services.EventService;
-import com.rpgtech.eventmanager.services.ScenarioService;
-import com.rpgtech.eventmanager.services.SessionService;
-import com.rpgtech.eventmanager.services.UserInfoService;
+import com.rpgtech.eventmanager.services.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +26,8 @@ public class SessionServiceImpl implements SessionService {
     private final ScenarioService scenarioService;
     private final UserInfoService userInfoService;
     private final EventService eventService;
+
+    private final EmailSender emailSender;
     @Override
     public List<SessionEntity> getAllSessions() {
         return sessionRepository.findAll();
@@ -41,12 +42,20 @@ public class SessionServiceImpl implements SessionService {
     @Override
     @Transactional
     public SessionEntity addSession(SessionCreateDTO session) {
+        SessionEntity sessionEntity = createSession(session);
+        if(sessionEntity.getEvent() == null){
+            handleEmailAvailableEvents(sessionEntity);
+        }
+        return sessionEntity;
+    }
+
+    public SessionEntity createSession(SessionCreateDTO session){
         ScenarioEntity scenario = scenarioService.getScenarioById(session.getScenarioID());
         EventEntity event = handleSessionEvent(session, scenario);
         SessionEntity sessionEntity = new SessionBuilder(session.getMeetingLink(),
-                                        userInfoService.currentlyLoggedUser(),
-                                        session.getStartsAt(),
-                                        scenario)
+                userInfoService.currentlyLoggedUser(),
+                session.getStartsAt(),
+                scenario)
                 .event(event)
                 .build();
         sessionEntity.setActive(true);
@@ -56,7 +65,6 @@ public class SessionServiceImpl implements SessionService {
         return sessionRepository.save(sessionEntity);
     }
 
-    //TODO - dodać obsługę mailową dla listy eventów
     private EventEntity handleSessionEvent(SessionCreateDTO session, ScenarioEntity scenario){
         if(session.getEventID() != null){
             EventEntity event = eventService.findEventById(session.getEventID());
@@ -70,6 +78,19 @@ public class SessionServiceImpl implements SessionService {
                                                             .filter(event -> isSessionInEvent(event, session.getStartsAt(), scenario))
                                                             .collect(Collectors.toList());
         return null;
+    }
+
+    private void handleEmailAvailableEvents(SessionEntity session){
+        String link="";
+        List<EventEntity> events = eventService.getEvents()
+                .stream()
+                .filter(event -> isSessionInEvent(event, session.getStartsAt(), session.getScenario()))
+                .collect(Collectors.toList());
+
+        for(EventEntity event: events){
+            link += "<p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">If you want to resign from taking part in this event click following link: <a href=\"http://localhost:8080/session/eventAppend/"+session.getId()+"/"+event.getId()+"\">Activate Now</a> </p>";
+        }
+        emailSender.send(userInfoService.currentlyLoggedUser().getEmail(), SessionService.buildEmailAvailableEvents(userInfoService.currentlyLoggedUser().getEmail(), link));
     }
 
     private boolean isSessionInEvent(EventEntity event, LocalDateTime startTime, ScenarioEntity scenario) {
@@ -86,6 +107,9 @@ public class SessionServiceImpl implements SessionService {
                 .orElseThrow(() -> new SessionNotFoundException("Session with id:"+id+" not found!"));
         ScenarioEntity scenario = scenarioService.getScenarioById(session.getScenarioID());
         EventEntity event = handleSessionEvent(session, scenario);
+        if(event == null){
+            handleEmailAvailableEvents(sessionEntity);
+        }
         sessionEntity = new SessionBuilder(session.getMeetingLink(),
                 userInfoService.currentlyLoggedUser(),
                 session.getStartsAt(),
@@ -97,6 +121,7 @@ public class SessionServiceImpl implements SessionService {
                 scenario.getDurationHours(),
                 scenario.getDurationMinutes()));
         sessionEntity.setId(id);
+        handleEmailsOnEdit(sessionEntity);
         return sessionRepository.save(sessionEntity);
     }
 
@@ -121,6 +146,7 @@ public class SessionServiceImpl implements SessionService {
         SessionEntity session = sessionRepository.findById(id)
                 .orElseThrow(() -> new SessionNotFoundException("Session with id:"+id+" not found!"));
         session.setActive(false);
+        handleEmailsOnEdit(session);
         return sessionRepository.save(session);
     }
 
@@ -141,5 +167,23 @@ public class SessionServiceImpl implements SessionService {
         return sessionStart
                 .plusHours(hours)
                 .plusMinutes(minutes);
+    }
+
+    public void handleEmailsOnEdit(SessionEntity session){
+        Set<Observer> observers = session.getObservers();
+        for (Observer observer : observers) {
+            if (session.isActive()) {
+                String link;
+                if (observer.getClass().equals(UserInfo.class)) {
+                    link = "http://localhost:8080/participant/cancel/session/" + observer.getId() + "?event" + session.getId();
+                } else {
+                    link = "http://localhost:8080/participant/cancel/withoutAccount/session/" + observer.getId() + "?event" + session.getId();
+                }
+                emailSender.send(observer.getEmail(), SessionService.buildEmail(observer.getEmail(), session, link));
+            }
+            else{
+                emailSender.send(observer.getEmail(), SessionService.buildEmailCancelledEvent(observer.getEmail(), session));
+            }
+        }
     }
 }

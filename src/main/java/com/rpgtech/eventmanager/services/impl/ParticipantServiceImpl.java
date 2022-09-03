@@ -56,9 +56,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public String resignLoggedUserSession(Long sessionId) {
+    public String resignLoggedUserSession(Long sessionId, Long id) {
         SessionEntity session = sessionService.getSessionById(sessionId);
-        sessionService.assignUsersToSession(session.resignUser(userInfoService.currentlyLoggedUser()), sessionId);
+        sessionService.assignUsersToSession(session.resignUser(userInfoService.findUserInfoById(id)), sessionId);
         return "You have been removed from this session, there is "+session.getObservers().size()+" places taken out of"+session.getScenario().getPlayers()+".";
     }
 
@@ -70,9 +70,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public String resignLoggedUserEvent(Long eventId) {
+    public String resignLoggedUserEvent(Long eventId, Long id) {
         EventEntity event = eventService.findEventById(eventId);
-        eventService.assignUsersToEvent(event.resignUser(userInfoService.currentlyLoggedUser()), eventId);
+        eventService.assignUsersToEvent(event.resignUser(userInfoService.findUserInfoById(id)), eventId);
         return "You have been removed from this event, there is "+event.getObservers().size()+" places taken.";
     }
 

@@ -13,11 +13,11 @@ public interface ParticipantService {
 
     String assignUnregisteredToEvent(ParticipantEntity participant, Long id);
 
-    String resignLoggedUserSession(Long sessionId);
+    String resignLoggedUserSession(Long sessionId, Long id);
 
     String resignUnregisteredSession(Long id, Long sessionId);
 
-    String resignLoggedUserEvent(Long eventId);
+    String resignLoggedUserEvent(Long eventId, Long id);
 
     String resignUnregisteredEvent(Long id, Long eventId);
 }

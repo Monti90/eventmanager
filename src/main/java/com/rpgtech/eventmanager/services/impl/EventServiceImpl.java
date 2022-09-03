@@ -72,7 +72,7 @@ public class EventServiceImpl implements EventService {
     public List<EventEntity> getEvents() {
         return eventRepository.findAll()
                 .stream()
-                .filter(event -> event.isActive() == true)
+                .filter(EventEntity::isActive)
                 .collect(Collectors.toList());
     }
 
@@ -101,20 +101,25 @@ public class EventServiceImpl implements EventService {
         EventEntity event = eventRepository.findById(id)
                 .orElseThrow(() -> new EventNotFoundException("Event with ID: "+id+" not found"));
         event.setActive(false);
+        handleEmailsOnEdit(event);
         return eventRepository.save(event);
     }
 
     public void handleEmailsOnEdit(EventEntity event){
-        Set<Observer> observers = event.getObservers();
-        for(Observer observer : observers){
-            String link;
-            if(observer.getClass().equals(UserInfo.class)){
-                link = "http://localhost:8080/participant/cancel/event?event" + event.getId();
+            Set<Observer> observers = event.getObservers();
+            for (Observer observer : observers) {
+                if (event.isActive()) {
+                    String link;
+                    if (observer.getClass().equals(UserInfo.class)) {
+                        link = "http://localhost:8080/participant/cancel/event/" + observer.getId() + "?event" + event.getId();
+                    } else {
+                        link = "http://localhost:8080/participant/cancel/withoutAccount/event/" + observer.getId() + "?event" + event.getId();
+                    }
+                    emailSender.send(observer.getEmail(), EventService.buildEmail(observer.getEmail(), event, link));
+                }
+                else{
+                    emailSender.send(observer.getEmail(),EventService.buildEmailCancelledEvent(observer.getEmail(), event));
+                }
             }
-            else{
-                link = "http://localhost:8080/participant/cancel/withoutAccount/event/"+observer.getId()+"?event" + event.getId();
-            }
-            emailSender.send(observer.getEmail(), EventService.buildEmail(observer.getEmail(), event, link));
-        }
     }
 }
