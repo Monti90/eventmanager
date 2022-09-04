@@ -111,9 +111,9 @@ public class EventServiceImpl implements EventService {
                 if (event.isActive()) {
                     String link;
                     if (observer.getClass().equals(UserInfo.class)) {
-                        link = "http://localhost:8080/participant/cancel/event/" + observer.getId() + "?event" + event.getId();
+                        link = "http://localhost:8080/participant/cancel/event/" + observer.getId() + "?event=" + event.getId();
                     } else {
-                        link = "http://localhost:8080/participant/cancel/withoutAccount/event/" + observer.getId() + "?event" + event.getId();
+                        link = "http://localhost:8080/participant/cancel/withoutAccount/event/" + observer.getId() + "?event=" + event.getId();
                     }
                     emailSender.send(observer.getEmail(), EventService.buildEmail(observer.getEmail(), event, link));
                 }

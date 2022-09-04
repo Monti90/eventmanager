@@ -29,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                     .antMatchers("/participant/withoutAccount/**")
                     .permitAll()
-                    .antMatchers("/parcitipant/cancel/withoutAccount/**")
+                    .antMatchers("/participant/cancel/withoutAccount/**")
                     .permitAll()
                     .antMatchers(HttpMethod.GET,"/session")
                     .permitAll()

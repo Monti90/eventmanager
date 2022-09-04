@@ -88,7 +88,7 @@ public class SessionServiceImpl implements SessionService {
                 .collect(Collectors.toList());
 
         for(EventEntity event: events){
-            link += "<p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">If you want to resign from taking part in this event click following link: <a href=\"http://localhost:8080/session/eventAppend/"+session.getId()+"/"+event.getId()+"\">Activate Now</a> </p>";
+            link += "<p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">"+event.getName()+" by:"+event.getOrganization().getOrganizationName()+": <a href=\"http://localhost:8080/session/eventAppend/"+session.getId()+"/"+event.getId()+"\">Assign Now</a> </p>";
         }
         emailSender.send(userInfoService.currentlyLoggedUser().getEmail(), SessionService.buildEmailAvailableEvents(userInfoService.currentlyLoggedUser().getEmail(), link));
     }
@@ -175,9 +175,9 @@ public class SessionServiceImpl implements SessionService {
             if (session.isActive()) {
                 String link;
                 if (observer.getClass().equals(UserInfo.class)) {
-                    link = "http://localhost:8080/participant/cancel/session/" + observer.getId() + "?event" + session.getId();
+                    link = "http://localhost:8080/participant/cancel/session/" + observer.getId() + "?session=" + session.getId();
                 } else {
-                    link = "http://localhost:8080/participant/cancel/withoutAccount/session/" + observer.getId() + "?event" + session.getId();
+                    link = "http://localhost:8080/participant/cancel/withoutAccount/session/" + observer.getId() + "?session=" + session.getId();
                 }
                 emailSender.send(observer.getEmail(), SessionService.buildEmail(observer.getEmail(), session, link));
             }

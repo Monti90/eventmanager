@@ -34,22 +34,22 @@ public class ParticipantController {
         return new ResponseEntity<>(participantService.assignUserToSession(id),HttpStatus.OK);
     }
 
-    @PutMapping("/cancel/session/{id}")
+    @GetMapping("/cancel/session/{id}")
     public ResponseEntity<String> resignLoggedUserSession(@PathVariable("id") Long id, @RequestParam("session") Long sessionId){
         return new ResponseEntity<>(participantService.resignLoggedUserSession(sessionId, id),HttpStatus.OK);
     }
 
-    @PutMapping("/cancel/withoutAccount/session/{id}")
+    @GetMapping("/cancel/withoutAccount/session/{id}")
     public ResponseEntity<String> resignUnregisteredSession(@PathVariable("id") Long id, @RequestParam("session") Long sessionId){
         return new ResponseEntity<>(participantService.resignUnregisteredSession(id, sessionId),HttpStatus.OK);
     }
 
-    @PutMapping("/cancel/event/{id}")
+    @GetMapping("/cancel/event/{id}")
     public ResponseEntity<String> resignLoggedUserEvent(@PathVariable("id") Long id, @RequestParam("event") Long eventId){
         return new ResponseEntity<>(participantService.resignLoggedUserEvent(eventId, id),HttpStatus.OK);
     }
 
-    @PutMapping("/cancel/withoutAccount/event/{id}")
+    @GetMapping("/cancel/withoutAccount/event/{id}")
     public ResponseEntity<String> resignUnregisteredEvent(@PathVariable("id") Long id, @RequestParam("event") Long eventId){
         return new ResponseEntity<>(participantService.resignUnregisteredEvent(id, eventId),HttpStatus.OK);
     }
